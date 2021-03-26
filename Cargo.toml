@@ -1,0 +1,15 @@
+[package]
+name = "rsu"
+version = "0.1.0"
+authors = ["Norbytus <norbyt93@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+actix-web = "3.3.2"
+serde = { version = "1.0.124", features = ["derive"] }
+serde_json = "1.0.64"
+log = "0.4.14"
+simple_logger = "1.11.0"
+nanoid = "0.3.0"
