@@ -5,6 +5,8 @@ use actix_web::{HttpResponse, Responder, ResponseError, http::StatusCode};
 
 pub mod file;
 
+pub mod redis;
+
 pub trait Storage<I> {
     fn find_short_url(&mut self, hash: String) -> E<Option<I>>;
 
@@ -56,8 +58,13 @@ impl ResponseError for ShortUrlStorageError {
 }
 
 impl Display for ShortUrlStorageError {
-    fn fmt(&self, _f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        todo!()
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self.error {
+            StorageError::UndefinedError => write!(f, "Undefined error"),
+            StorageError::TemporarilyUnavailable => write!(f, "Temporarily Unavailable"),
+            StorageError::ErrorOnSave => write!(f, "Error on save"),
+            StorageError::NotFound => write!(f, "Not found"),
+        }
     }
 }
 

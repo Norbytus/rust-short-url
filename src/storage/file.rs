@@ -1,5 +1,8 @@
+use chrono::{Duration, Utc};
+use log::info;
+
 use super::*;
-use std::io::{BufWriter, BufReader, Write, BufRead};
+use std::{fs::copy, io::{BufRead, BufReader, BufWriter, Seek, Write}, ops::Add};
 use crate::ShortUrlData;
 use std::fs::File;
 
@@ -14,11 +17,16 @@ impl Storage<ShortUrlData> for FileStorage {
 
         let data: Vec<ShortUrlData> = buffer
             .lines()
-            .map(|line| line.unwrap_or(String::new()))
+            .map(|line| {
+                line.unwrap_or(String::new())
+            })
             .map(|str_data| serde_json::from_str::<ShortUrlData>(&str_data))
             .filter(|serd_result| serd_result.is_ok())
             .map(|serd_result| serd_result.unwrap())
-            .filter(move |short_url| short_url.hash == hash)
+            .filter(move |short_url| {
+                short_url.hash == hash
+            })
+            .filter(|short_url| short_url.is_valid())
             .collect();
 
         Ok(data.get(0).map(|v| v.clone()))
@@ -30,7 +38,7 @@ impl Storage<ShortUrlData> for FileStorage {
 
         let mut buff = BufWriter::new(&mut self.file);
 
-        if let Err(e) = buff.write(raw.as_bytes()) {
+        if let Err(_) = buff.write(raw.as_bytes()) {
             Err(ShortUrlStorageError {
                 error: StorageError::ErrorOnSave,
             })
